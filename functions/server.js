@@ -1,6 +1,4 @@
 const functions = require("firebase-functions");
-
-
 const { google } = require('googleapis');
 const express = require('express');
 const bodyParser = require("body-parser");
@@ -30,8 +28,6 @@ router.post('/sendToDevice', (req, res) => {
 
         const score = data.score;
         const mtime = data.time;
-
-        console.log(data);
 
         const message = {
             message: {
@@ -64,52 +60,7 @@ router.post('/sendToDevice', (req, res) => {
     });
 });
 
-router.post('/sendToDevices', (req, res) => {
-
-    getAccessToken().then((access_token) => {
-        // const notification data
-        const title = req.body.notification.title;
-        const body = req.body.notification.body;
-        const data = req.body.data;
-        const client_tokens = req.body.tokens;
-
-        const score = data.score;
-        const mtime = data.time;
-
-        const message = {
-            message: {
-            tokens: client_tokens,
-            notification: {
-                title: title,
-                body: body
-        },
-            data: {
-                score: score,
-                mtime: mtime
-        }
-        }
-        };
-
-        // Send request
-        request.post({
-            headers: {
-            Authorization: 'Bearer '+access_token
-        },
-            url: HOST+PATH,
-            body: JSON.stringify(message),
-        }, (error, response, body)=>{
-        res.end(body);
-        if(error) {
-            console.log('Error sending message: ', error);
-        }
-    });
-
-    });
-});
-
 app.use('/api/v1', router);
-
-
 app.listen(8085, ()=>{
     console.log('Server started on PORT=8085');
 });
