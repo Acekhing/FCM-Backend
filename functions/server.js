@@ -17,7 +17,12 @@ const router = express.Router();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-router.post('/sendToDevice', (req, res) => {
+
+/* 
+This is the code that sends the notification to users 
+to users of a particular device
+ */
+router.post('/v1/send/user', (req, res) => {
 
     getAccessToken().then((access_token) => {
         // const notification data
@@ -60,7 +65,52 @@ router.post('/sendToDevice', (req, res) => {
     });
 });
 
-app.use('/api/v1', router);
+/* 
+This is the code that sends the notification to users 
+that has subscribed to a particular topic
+ */
+router.post('/v1/send/topic', (req, res) => {
+
+    getAccessToken().then((access_token) => {
+        // const notification data
+        const notification = req.body.notification;
+        const topic = req.body.topic;
+        const data = req.body.data;
+
+        const message = {
+            message: {
+                topic: topic,
+                notification: {
+                    title: notification.title,
+                    body: notification.body
+                },
+                data: {
+                    
+                }
+            }
+          };
+
+        // Send request
+        request.post({
+            headers: {
+                Authorization: 'Bearer '+access_token
+            },
+            url: HOST+PATH,
+            body: JSON.stringify(message),
+        }, (error, response, body)=>{
+            res.end(body);
+            if(error) {
+                console.log('Error sending message: ', error);
+            }
+        });
+
+    });
+});
+
+
+
+
+app.use('/api', router);
 app.listen(8085, ()=>{
     console.log('Server started on PORT=8085');
 });
@@ -84,6 +134,5 @@ function getAccessToken() {
       });
     });
 }
-
 
 exports.api = functions.https.onRequest((app));
