@@ -68,3 +68,4 @@ node_modules/
 # Personal
 functions/node_modules
 functions/service-account.json
+functions/.env
